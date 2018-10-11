@@ -1,0 +1,8 @@
+#!/bin/bash
+
+docker run -it --rm \
+  --publish 80:80 \
+  -v "$PWD":/var/www/html \
+  -v ~/.composer:/root/composer/ \
+  yr-bdd:basic \
+  $1
