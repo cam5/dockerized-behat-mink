@@ -1,0 +1,22 @@
+default:
+  suites:
+    default:
+      contexts:
+        - FeatureContext
+  extensions:
+    Behat\MinkExtension:
+      base_url: 'http://localhost/app.php'
+      browser_name: chrome
+      javascript_session: selenium2
+      selenium2:
+        wd_host: http://{your-selenium-host-ip}:4444/wd/hub
+        capabilities:
+          # required by mink-extension 2.3
+          marionette: null
+          browserName: chrome
+          browser: chrome
+      sessions: # can be specified via @session_name annotations in .feature files!
+        default:
+          goutte: ~
+        javascript:
+          selenium2: ~

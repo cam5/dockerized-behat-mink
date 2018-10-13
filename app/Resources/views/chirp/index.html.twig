@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Chirps list</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Body</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for chirp in chirps %}
+            <tr>
+                <td><a href="{{ path('chirp_show', { 'id': chirp.id }) }}">{{ chirp.id }}</a></td>
+                <td>{{ chirp.body }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('chirp_show', { 'id': chirp.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('chirp_edit', { 'id': chirp.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('chirp_new') }}">Create a new chirp</a>
+        </li>
+    </ul>
+{% endblock %}

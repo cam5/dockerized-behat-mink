@@ -42,7 +42,7 @@ if [ "test" = "$CMD" ]; then
   fi;
 
   php bin/console doctrine:schema:update --force
-  /var/www/html/vendor/bin/behat
+  /var/www/html/vendor/bin/behat --tags ~@javascript
 fi;
 
 $CMD
