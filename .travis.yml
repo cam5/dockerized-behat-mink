@@ -8,6 +8,7 @@ services:
 before_install:
 - docker build -t yr-bdd:full docker/full
 - mkdir -p var/cache/prod && mkdir -p var/sessions/prod && mkdir -p var/logs/prod
+- chmod +w var/cache/prod && mkdir +w var/sessions/prod && mkdir +w var/logs/prod
 
 script:
 - ./bin/docker test
