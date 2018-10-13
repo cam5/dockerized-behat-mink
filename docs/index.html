@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>BDD + PHP = BFF</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <style type="text/css">
+      @import url('https://fonts.googleapis.com/css?family=Fanwood+Text');
+      @import url('https://fonts.googleapis.com/css?family=Montserrat:400,400i,500,500i,600,600i,700,700i');
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+      body { font-family: 'Montserrat'; }
+      h1, h2, h3 {
+        font-family: 'Avenir Next';
+        font-weight: 600;
+        color: #032E39;
+        letter-spacing: 1px;
+        margin-bottom: 10px;
+      }
+
+      ul {
+        margin-top: 10px;
+        margin-bottom: 10px;
+      }
+
+      img {
+        max-width: 100%;
+        max-height: 40vh;
+        margin: 0 auto;
+        display: block;
+      }
+
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: middle
+
+# Behaviour Driven Development with PHP, Behat, and Mink
+
+(Featuring Docker! 🐳)
+
+---
+
+class: middle
+
+## Some questions to answer
+
+* What is BDD, how is it different from TDD?
+* What is a unit test. How is it different from a "functional test"?
+* When should I use BDD?
+* What are the tradeoffs? What do I sacrifice by going BDD?
+
+---
+
+class: middle
+
+## Core Concepts
+
+* Context-Action-Outcome pattern
+* Gherkin/Cucumber "language" &amp; `.feature` files
+* BDD Framework / Assertion Library (PHPUnit) / Web Functionality (Mink)
+* Choice of WebDrivers
+
+---
+
+class: middle
+
+## Overview
+
+* How can I get started with BDD?
+* Writing our first `.feature` file.
+* Generating context files &amp; appending step definitions
+* Including asserts
+* Including "Mink", and Configuring WebDrivers
+* Definition list
+* Test web-facing features
+* Running behat in a CI environment
+
+---
+
+class: middle
+
+## What is BDD, and how is it different than TDD?
+
+**BDD** &mdash; **B**ehaviour **D**riven **D**evelopment.
+
+**TDD** &mdash; **T**est **D**riven **D**evelopment.
+
+When you put the two terms side-by-side like that, they don't seem very
+distinct, do they?
+
+???
+
+Tests in the BDD paradigm are "Black Box" tests; they're high-level. Broadly
+speaking, they don't make any assumptions about the inner workings of the
+application.
+
+Tests in the TDD paradigm usually imply unit-tests, or "Clear Box" tests; they
+might isolate a class or a method for testing. (Something that a user would
+have no knowledge of).
+
+---
+
+## Black Box Testing
+
+* Tests input and output *at the application level*
+  * For this reason, tests are close to application specs
+* Assumes no knowledge of __how__ results are generated
+
+![Black Box](./black-box.png)
+
+---
+
+## White Box Testing
+
+* Tests assume knowledge of modules/units inside an application
+* Classes can be tested in isolation
+* Generates greater code coverage
+
+![White Box](./white-box.png)
+
+---
+
+class: middle
+
+BDD &amp; TDD are philosophies, rather than sets of tools. You can "do BDD" with
+PHPUnit, and you can "do TDD" with Behat. The borders between these tools &amp;
+concepts are somewhat porous!
+
+---
+
+class: middle
+
+## Why Should I Use Behat/BDD for testing my PHP application?
+
+1. Fun, informative workflow!
+2. Share terse, unambiguous, functional, and human-readable specifications.
+ * Clients and non-technical colleagues will love it..
+3. Lets you write specs through the user's eyes
+ * this often reveals assumptions sooner than they would otherwise be seen.
+
+???
+
+Additionally – it can be used to test things like how your application
+integrates a 3rd party library or package. I.e., does your auth system work
+properly *at a browser* level?
+
+Behat is also not some alpha-0.2, just-in-it-for-the-github-stars-vapourware.
+It's been around since 2011, and while it doesn't have the 11k GitHub stars
+that PHPUnit has, 2.7k is nothing to shake a stick at, either!
+
+---
+
+class: middle
+
+## When Would I Be Better off with TDD and/or PHPUnit?
+
+Rule of thumb - BDD is for user-level testing. Can be great for smoke-tests, It
+also provides a nice bridge for communicating specs w/ client.
+
+Use TDD/Unit-testing for libraries you plan to reuse, and when you want to
+ensure code coverage. When developers are your client or stakeholder, they'll
+probably appreciate your unit tests, rather than application-level tests.
+
+---
+
+class: center, middle
+
+### Demo time!
+
+<iframe src="https://giphy.com/embed/PlwtdKszlxyLK" width="480" height="418" frameBorder="0" class="giphy-embed" allowFullScreen></iframe>
+
+---
+
+class: middle
+
+# Behat Quickstart/Overview
+
+* Create a brand new project w/ composer.
+* Require Behat &amp; configure it to do some very basic hello world testing.
+* Install &amp; base configuration of Mink
+  * Why Mink? What's it Do? WebDrivers? Whaat?
+  * Check out the new output of behat -dl
+* Require selenium and control the browser to test some JS, then, too!
+
+[https://dannorth.net/whats-in-a-story/](https://dannorth.net/whats-in-a-story/)
+
+[https://dannorth.net/introducing-bdd/](https://dannorth.net/whats-in-a-story/)
+
+---
+
+class: middle
+
+## Create new project
+
+```bash
+composer init
+composer require --dev behat/behat
+vendor/bin/behat --init
+```
+
+---
+
+class: middle
+
+### Create a contrived example about math.
+
+Create a `math.feature` file, and test some basics.
+
+```gherkin
+When I add "1" and "2"
+Then the result should equal "3"
+```
+
+implement `Behat\Behat\Context\SnippetAcceptingContext`
+
+Run `behat` and append the step definitions. Fail, update FeatureContext.php until it works!
+
+---
+
+class: middle
+
+### Parsing, and what's what.
+
+Gherkin = the language we're seeing in the `.feature` files.
+
+The class `Behat\Gherkin` is an implementation of the gherkin language.
+
+Behat is the thing that matches parses gherkin steps and maps them to
+executable methods in a `FeatureContext` file.
+
+> Behat does not differentiate between step keywords when matching regular
+  expressions to methods. So a step defined with @When could also be matched to
+  `@Given` ..., `@Then` ..., `@And` ..., `@But` ..., etc.
+
+(http://docs.behat.org/en/v2.5/guides/2.definitions.html)
+
+---
+
+class: middle
+
+### Refactor to use some proper asserts
+
+```bash
+composer require --dev phpunit/phpunit
+```
+
+```php
+use PHPUnit\Framework\Assert as Assertions
+```
+
+`Assertions::assertTrue, ::assertEquals`
+
+---
+
+class: middle
+
+## Install Mink
+
+So far, it probably looks like we've shown an alternative boilerplate to the
+regular PHPUnit config - we've just been asserting things slightly differently.
+
+Let's dig a little deeper into the Behaviour Driven part of BDD. It's time to
+install Mink - a browser controller.
+
+[http://mink.behat.org/en/latest/at-a-glance.html](http://mink.behat.org/en/latest/at-a-glance.html)
+
+```bash
+composer require --dev behat/mink behat/mink-goutte-driver behat/mink-extension
+```
+
+(Examine the 'suggests installing' parts of composer output)
+
+---
+
+class: middle
+
+## Configure, and extend our earlier class
+
+```bash
+./vendor/bin/behat -dl
+```
+
+Definition list is still the same as before. Better configure it!
+
+---
+
+### Hold on, I don't have any Context for this
+
+http://behat.org/en/latest/user_guide/context.html#multiple-contexts
+
+> Your context class is initialized before each scenario is run, and every
+  scenario has its very own context instance. This means 2 things:
+
+> 1. Every scenario is isolated from each other scenario’s context. You can do
+  almost anything inside your scenario context instance without the fear of
+  affecting other scenarios - every scenario gets its own context instance.
+
+> 2. Every step in a single scenario is executed inside a common context instance.
+  This means you can set private instance variables inside your `@Given` steps
+  and you’ll be able to read their new values inside your `@When` and `@Then`
+  steps.
+
+---
+
+class: middle
+
+Make a `behat.yml` file to configure, and test what definitions we have:
+
+```yaml
+# behat.yml
+default:
+  suites:
+    default:
+      contexts:
+        - FeatureContext
+  extensions:
+    Behat\MinkExtension:
+      base_url:  ~
+      sessions: # can be specified via @session_name annotations in .feature files!
+        default:
+          goutte: ~
+```
+
+And, extend our base context:
+```php
+class FeatureContext extends MinkContext
+```
+
+---
+
+class: middle, center
+
+# Let's goooo(gle)
+
+<iframe src="https://giphy.com/embed/IwTWTsUzmIicM" width="480" height="359" frameBorder="0" class="giphy-embed" allowFullScreen></iframe>
+
+```bash
+./vendor/bin/behat -dl
+```
+
+---
+
+# Select some elements, and submit some forms
+
+```gherkin
+Given I go to "http://google.com"
+When I fill in "Search" with "Test"
+And I press "Google Search"
+```
+
+### Examine the source of fill in "" with "" definition
+
+```bash
+vendor/behat/mink-extension/src/Behat/MinkExtension/Context/MinkContext.php:121
+vendor/behat/mink/src/Element/TraversableElement.php:152
+vendor/behat/mink/src/Selector/NamedSelector.php
+```
+
+---
+
+class: middle
+
+### Headless/Head-ed browsers
+
+From our more trivial selection above, we might also want to see autocomplete.
+For that, we can't use a headless browser like Goutte. We'll need a full on
+browser emulator to parse the JavaScript!
+
+```bash
+composer require --dev behat/mink-selenium2-driver
+brew install selenium-server-standalone chromedriver
+ifconfig | grep inet
+```
+
+```yaml
+# behat.yml
+# ...
+      selenium2:
+        wd_host: http://{host-machine-network-ip}:4444/wd/hub
+        capabilities:
+          # required by mink-extension 2.3
+          marionette: null
+          browserName: chrome
+          browser: chrome
+      sessions:
+        # ...
+        javascript:
+          selenium2: ~
+
+```
+
+Test the autocomplete of DuckDuckGo.
+
+???
+
+```php
+    /**
+     * @When I wait to see if autocomplete contains :words
+     */
+    public function iWaitToSeeWords($words)
+    {
+        $this->getSession()->wait(
+            5000,
+            "document.querySelectorAll('.search__autocomplete').length"
+        );
+
+        Assertions::assertContains(
+            $words,
+            $this->getSession()->evaluateScript("document.querySelectorAll('.search__autocomplete')[0].innerText")
+        );
+    }
+```
+
+---
+
+# Let's See the BDD Methodology in Action!
+
+New app. Let's make a really cool site where you can share what you ate for
+breakfast in 140 characters or less!
+
+```bash
+symfony new chirp.ly lts
+mv behat.yml chirp.ly/ && mv -f features/ chirp.ly/features
+mv ./bin/docker chirp.ly/bin
+```
+
+???
+
+* Edit .gitignore
+* Remove that block from `app_dev.php` that disallows localhost.
+* Update `behat.yml` to put the `app_dev.php` into the `base_url`
+
+`composer update`
+
+
+---
+
+class: middle
+
+## First Test
+
+```gherkin
+Feature: Does it turn on?
+  In order to "Smoke Test" the application
+  As a Developer
+  I need to be able to confirm that predicable text is served on the homepage.
+
+  Scenario: Visiting Homepage
+    Given I am on the homepage
+    Then the response status code should be 200
+    And I should see text matching "Your application is now ready."
+```
+
+---
+
+class: middle
+
+## Adding a Feature
+
+Okay – let's start with the bare minimum:
+
+```gherkin
+Feature: Post a chirp
+  In order to tell the world my thoughts
+  As an anonymous user
+  I need to be able to post to chirp.ly
+
+  Scenario: Finding "new chirp" page
+    Given I am on the homepage
+    Then I should see a "Post Chirp" element
+    When I follow "Post Chirp"
+    And the response status code should be 200
+    Then the url should match "/app_dev.php/chirp/new"
+    And I should see a "textarea" element
+```
+
+???
+
+```bash
+php bin/console doctrine:generate:entity AppBundle:Chirp
+php bin/console d:s:u -f
+php bin/console doctrine:generate:crud AppBundle:Chirp
+```
+
+---
+
+```gherkin
+Feature: Post a chirp
+  In order to tell the world my thoughts
+  As an anonymous user
+  I need to be able to post to chirp.ly
+
+  Scenario: Navigating to the "new chirp" page
+    Given I am on the homepage
+    Then I should see a "a#post-chirp" element
+    When I follow "Post Chirp"
+    And the response status code should be 200
+    Then the url should match "/chirp/new"
+    And I should see a "textarea" element
+    And print current URL
+
+  Scenario: Making a new chirp
+    Given I am on "/chirp/new"
+    And I fill in the following:
+      | Body | I am really loving this site!!! |
+    And I press "Create"
+    And the response status code should be 200
+    Then the url should match "/chirp/\d+"
+    And I should see "I am really loving this site!!!"
+```
+
+---
+
+## API profile vs. User profile
+
+### Testing Glossary
+- White Box Testing (Structural testing)
+  - TDD
+  - Unit Tests
+- Black Box Testing (Functional Testing)
+  - BDD
+  - Functional Tests
+---
+
+    </textarea>
+    <script src="https://remarkjs.com/downloads/remark-latest.min.js" type="text/javascript">
+    </script>
+    <script type="text/javascript">
+      var slideshow = remark.create();
+    </script>
+  </body>
+</html>
