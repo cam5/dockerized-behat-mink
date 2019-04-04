@@ -11,3 +11,4 @@ before_install:
 
 script:
 - ./bin/docker test
+- ls -lahR ./var/
