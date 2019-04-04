@@ -1,9 +1,9 @@
-FROM php:7.2-apache
+FROM php:7-apache
 
-RUN apt update && apt install vim git-core zip unzip less -y && apt clean
+RUN apt update && apt upgrade -y && apt install vim git-core zip unzip less -y && apt clean
 
 # Install MySQL and then purge to keep image size small-ish.
-RUN apt update && apt install -y mysql-server php7.2-mysql/testing \
+RUN apt update && apt install -y mysql-server \
   && docker-php-ext-install pdo_mysql \
   && apt purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
   && apt remove -y --purge software-properties-common \

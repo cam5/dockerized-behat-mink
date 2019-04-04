@@ -1,4 +1,4 @@
-FROM php:7.2-apache
+FROM php:7-apache
 
 RUN apt update && apt install git-core zip unzip less -y && apt clean \
   && apt purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
