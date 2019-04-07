@@ -17,4 +17,3 @@ if [[ ! -f var/sessions/prod ]]; then
 fi;
 
 chmod g+w var/sessions/prod
-chown -R :root var/cache var/logs var/sessions
