@@ -10,6 +10,7 @@ before_install:
 - ./ci/prepare.sh
 - ls -lahR ./var/
 - docker build -t yr-bdd:full docker/full
+- docker inspect yr_bdd
 
 script:
 - ./bin/docker test
