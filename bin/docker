@@ -5,4 +5,4 @@ docker run -it --rm \
   -v "$PWD":/var/www/html \
   -v ~/.composer:/root/composer/ \
   yr-bdd:full \
-  $1
+  "$1"

@@ -6,11 +6,8 @@ services:
   - docker
 
 before_install:
-- ls -lahR ./var/
-- ./ci/prepare.sh
-- ls -lahR ./var/
 - docker build -t yr-bdd:full docker/full
-- cat /etc/docker/daemon.json
+- ./bin/docker "bash ci/prepare.sh"
 
 script:
 - ./bin/docker test
